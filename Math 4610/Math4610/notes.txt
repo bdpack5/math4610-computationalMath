@@ -1,0 +1,217 @@
+//set up code for bracket roots=
+int numt=1000000;
+xl = -3.0;
+xr=100.0;
+dx= (xr-xl)/((double)numt);
+xval=xl;
+fa=f(xval);
+for (int i=0; i<numt; i++){
+  xval=xval+dx;
+  fb = f(xval);
+  if(fa*fb <0){
+    //...
+  }
+  else {
+    //
+  }
+  //Output two arrays, one for left hand sides of intervals, one for right(can just
+  //use one.)
+}
+
+//open mp constructs - for, section, single
+#pragma omp parallel(clauses) //default open mp declaration, can cause issues with
+      {}                      //multiple threads trying to access the same memory.
+                              //better to use for constructs
+#pragma omp parallel for (clauses)//one clause is collapse(int), which collapses
+                                  //nested for loops.
+
+//Computational Linear Algebra:
+//Start with the solution of an (n x n) linear system.
+// Ax=b
+//A/within R^(nxn), x, b/within R^n
+//How to get around machine precision for LA?
+//two types of Algorithms:
+//1.Direct Methods - Alg completes in  a finite # of steps
+//Gaussian Elimination
+//LU factorization
+//LDL^T-factorization
+//Cholesly factorization
+//2. Iterative Methods
+//
+
+10/21/2019
+
+//Computational linear Algebra
+
+Suppose we solve a system Ax=b with exact solution x*
+How do we measure error between x* and an approximation
+of it?
+
+we can define algebraic operations on vectors:
+vector addition: u,v are entities of R^n, w is the sum of U and v if
+w_i=u_i+v_i
+
+vector subtraction: w_i=u_i-v_i
+
+scalar multiplication: Given a constraint a \ele R, compute w=au->w_i=a*u_i
+
+Matrix Vector mult.
+
+input: a/in R^nxn, x/in R^n
+output: y /in R^n
+
+y_i=sumj=1->n a_ij*x_j
+
+for (i=1,i<=n,i++){
+  y[i]=0.0;
+  for (j=1,j<=n,j++);
+    y[i]=y[i]+a[i][j]*x[j];
+}
+
+code to compute sums and scalar multiples of vectors
+
+double [] vecad(double[] u, double [] v){
+  int n=u.length;
+  double[] output=new double[n];
+  for(int i=0; i<n;i++)
+    output[i]=u[i]+v[i];
+  return output;
+}
+
+double[] veccross(u,v){
+  double[] output = new double [3];
+  output[0]=u[2]*v[3] - u[3]*v[2];
+  output[1]=u[3]*v[1] - u[1]*v[3];
+  output[3]=u[1]*v[2] - u[2]*v[1];
+  return output;
+}
+
+
+Solving linear systems: start with simple cases
+diagonal system: A has zeros everywhere but the diagonals. Trivial to solve Ax=b.
+This is used in Jacobi iteration.
+
+2. Upper Triangular system: only the diagonal and above (~top right quadrant)
+have non zeros.
+
+Start in lower right corner (only one entry) and work up from there.
+
+3. Lower Triangular system: only the diagonal and below.
+
+For a general system we will work on the augmented coefficient matrix.
+
+pivoting strategies:
+Partial and Scaled Partial Pivoting= use the current pivot column
+Complete Pivoting and Scaled Complete Pivoting + Use all entries that are left.
+
+Inputs: a/elm R^nxn b/elm R^n
+
+initialize indmap
+a map vector
+
+  for(int i=0; i<n; i++) indmap[i]=i;
+  for(int k=0; k<n-1; k++){
+    int inttemp = indmap[k];
+    double valmax = abs(a[indmap[k]][k])
+    for(int i=k+1; i<n; i++){
+      double valcheck = abs(a)[indmap[i]][k]);
+      if (valcheck>valmax){
+        valmax=valcheck;
+        indtemp=indmap[i];
+      }
+    }
+    for(int i=k+1; i<n;){
+      double factor= a[indmap[i]][k]/a[indmap[k]][k];
+      for (int j=k+1; j<n; j++){
+        a[indmap[i]][j]=a[indmap[i]][j]-factor*a[indmap[k]][j];
+      }
+      b[indmap[i]]=b[indmap[i]]-factor*b[indmap[k]];
+    }
+  }
+
+
+
+Backsubstitution:
+
+x[n-1] = b[indmap[n-1]]/a[indmap[n-1]][n-1];
+for(int i =n-2; i>=0; i--){
+  double sum = b[indmap[i]];
+  for(int j=i+1; j<n; j++){
+    sum = sum - a[indmap[i]][j]*x[j];
+  }
+  x[i]=sum/a[indmap[i]][j];
+}
+
+scaled partial pivoting:
+
+Cholesky factorization:
+
+for k=1:n-1
+  a_kk = sqrt(a_kk)
+  for i=k+1:n
+    a_ik=a_ik*a_kk
+    end
+  for j=k+1:n
+      for i=j:n
+        a_ij=a_ij-a_jk
+        end
+      end
+  end
+
+Input : A, b, x0, tol
+
+Set:
+  r0=b-Ax0
+  del=r0^Tr0
+  k=0
+  p0=r0  (search direction)
+  b(s)=b^Tb
+  while Sk>tol^2*b(s)
+    alpha_k=(r(k)^Tr(k))/[r(k)^TAr(k)]
+    x(k+1)=x(k)+alpha(k)r(k)
+    r(k+1)=b-Ax(k+1)
+
+
+
+
+r(k+1)=b-Ax(k+1)
+=b-Ax(k)-alpha(k)Ar(k)
+=r(k)-alpha(k)Ar(k)
+
+
+If two vectors u and v satisfy u^TAv=0 we say the vectors are A-conjugate.
+u^TAv=<u,v>_A=<Au,v>=<u,A^Tv>=<u,Av>
+
+The energy orm of a vector with respect to a spd matrix A is ||u||_A=sqrt(u^TAu)
+= <u,Au>
+
+Suppose that P={p1,p2...pn}, is a mutually A-conjugate set of vectors s.t.
+
+
+conjugate-gradient algorithm:
+
+r_0=b-Ax_0
+p_0=r_0
+k=0
+
+repeat:
+  alpha_k=(r_k^Tr_k)/p_k^TAp_k
+  x_k+1=x_k+alpha_kp_k
+  r_k+1=r_k-alpha_kAp_k
+  if r_k+1 is sufficietly small exit, else
+  beta_k=(r_k+1^Tr_k+1)/r_k^Tr_k
+  p_k+1=r_k+1+beta_kp_k
+
+congradient(A,b,x_0,tol){
+  r_0=b-Ax_0
+  p_0=r_0
+  k=0
+  while(r_k^T*r_k is too large){
+    s_k = Ap_k
+    alpha=(r_k^T*r_t)/(p_k^T*s_k)
+    x_k+1=x_k-alpha*p_k
+    r_k+1=r_k-alpha*s_k
+    beta=(r+k+1^T*r_k+1)/(r_k^T*Tr_kp_k+1=r_k+1 + beta*p_k)
+    k++
+  }
+}

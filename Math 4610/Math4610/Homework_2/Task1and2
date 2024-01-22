@@ -1,0 +1,14 @@
+To find the root for xcosh(x)+x^3=pi, we set f(x)=xcosh(x)+x^3-pi,
+then solve for the equation at 0. In order to do so computationally,
+we must decide an acceptable tolerance, than test various possible x's
+until one gives us a result that is 0, within tolerance. The basic form
+of a function call for doing so would be
+
+findRoot(function f, error, tolerance, startValue)
+
+In order to perform a fixed point iteration to find the root for
+xcosh(x)+x^3=pi, we need to find a function g(x) based on f(x)
+that takes the form x=g(x), in this case xcosh(x)+x^3=pi =>
+x(cosh(x)+x^2)=pi => x=pi/(cosh(x)+x^2). Then use this, with a
+shrewd estimate of the zero, to find where g(x)=x, which is also
+where f(x)=0.

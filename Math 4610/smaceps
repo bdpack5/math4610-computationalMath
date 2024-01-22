@@ -1,0 +1,14 @@
+#include <iostream>
+
+double smaceps(){
+    double epsilon = 1.0;
+    double one = 1.0;
+    double epsCheck;
+    double diff;
+    for (i=1, i<=1000, i++){
+      epsCheck = one + epsCheck;
+      diff = one - epsCheck;
+      cout<<diff<<"   "<<epsilon<<endl;
+      epsilon=epsilon/2;
+    }
+}
